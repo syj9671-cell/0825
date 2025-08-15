@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세대 공감 교수법 대화형 웹 애플리케이션 (최종판)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #fdfaf6; color: #333; }
+        .sticky-note { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .sticky-note:hover { transform: scale(1.05) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); z-index: 10; }
+        .nav-link { transition: color 0.3s, border-color 0.3s; }
+        .nav-link.active { color: #14B8A6; border-bottom-color: #14B8A6; }
+        section { scroll-margin-top: 80px; }
+        .fade-in { animation: fadeIn 1s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .keyword-tag { cursor: pointer; transition: all 0.2s ease-in-out; }
+        /* [수정] button 요소에 맞게 스타일 조정 */
+        .keyword-tag.selected { background-color: #14B8A6; color: white; transform: scale(1.1); border-color: #14B8A6; }
+        .citation { font-size: 0.8rem; color: #6b7280; text-align: right; margin-top: 1rem; }
+        .pyramid-btn.active { background-color: #14B8A6; color: white; border-color: #14B8A6; }
+    </style>
+</head>
+<body class="bg-[#fdfaf6]">
+
+    <header class="bg-[#fdfaf6]/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold text-gray-800">세대 공감 교수법</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#part0" class="nav-link text-gray-600 hover:text-[#14B8A6] border-b-2 border-transparent pb-1">준비하기</a>
+                    <a href="#part1" class="nav-link text-gray-600 hover:text-[#14B8A6] border-b-2 border-transparent pb-1">마음 열기</a>
+                    <a href="#part2" class="nav-link text-gray-600 hover:text-[#14B8A6] border-b-2 border-transparent pb-1">이론 더하기</a>
+                    <a href="#part3" class="nav-link text-gray-600 hover:text-[#14B8A6] border-b-2 border-transparent pb-1">지도안 보기</a>
+                    <a href="#part4" class="nav-link text-gray-600 hover:text-[#14B8A6] border-b-2 border-transparent pb-1">실전 대비</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section class="text-center mb-24 fade-in">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">체험으로 발견하고 이론으로 다지는</h2>
+            <p class="text-5xl md:text-6xl font-extrabold text-[#14B8A6] mb-6">세대 공감 교수법</p>
+            <p class="text-lg text-gray-600">세종시 인구교육 강사 양성 과정 (5주차): 중·고등학생편</p>
+            <p class="text-lg text-gray-800 font-bold mt-2">주강사: 경인교육대학교 사회과교육과 신예진 / 경기도 교육청 소속 파견교사</p>
+        </section>
+
+        <section id="part0" class="mb-24 fade-in">
+            <h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Part 0. 준비하기: 자기소개 및 아이스브레이킹</h3>
+            <p class="text-center text-gray-600 mb-12">본격적인 시작에 앞서, 서로를 알아가는 가벼운 활동으로 마음의 문을 엽니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">키워드로 말해요: 나를 소개하는 세 가지 단어</h4>
+                <p class="text-lg mb-6 text-gray-700">아래 키워드 중에서 지금의 나를 가장 잘 나타낸다고 생각하는 단어 세 가지를 선택해주세요.</p>
+                <div id="keyword-container" class="flex flex-wrap gap-4 justify-center">
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">열정적인 교육자</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">따뜻한 상담가</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">여행을 사랑하는</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">세종 토박이</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">드라마를 사랑하는</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">배움을 즐기는</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">든든한 해결사</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">꼼꼼한 계획가</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">가끔은 꼰대</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">디지털 초보</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">요리 고수</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">산책 예찬론자</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">긍정 에너지 전파자</button>
+                    <button type="button" class="keyword-tag bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-full">기타</button>
+                </div>
+                <p class="text-center text-gray-600 mt-8">선택한 키워드를 중심으로 잠시 후 모두 함께 가볍게 인사를 나눠보겠습니다.</p>
+                
+                <div class="mt-12 border-t pt-8">
+                    <h5 class="text-xl font-bold mb-4 text-center">실시간 키워드 선택 현황</h5>
+                    <div class="max-w-3xl mx-auto">
+                        <canvas id="keywordChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part1" class="mb-24 fade-in">
+            <h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Part 1. 활동으로 마음 열기</h3>
+            <p class="text-center text-gray-600 mb-12">이론에 앞서, 세 가지 체험 활동을 통해 세대 소통의 중요성을 직접 느껴봅니다.</p>
+            <div class="space-y-16">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">활동 1. ‘요즘 우리 아이들’ 이해하기</h4>
+                    <p class="text-lg mb-6 text-gray-700">"자녀 혹은 젊은 세대와 소통하며 ‘이것만은 참 이해하기 어렵다’고 느꼈던 경험을 한 문장으로 적어볼까요?"</p>
+                    <div id="sticky-note-wall" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 min-h-[200px] bg-gray-50 p-4 rounded-lg">
+                        <div class="sticky-note relative p-4 bg-pink-200 rounded-md shadow-sm transform rotate-1"><p class="font-medium">줄임말을 너무 많이 써서 못 알아들을 때가 많습니다.</p></div>
+                        <div class="sticky-note relative p-4 bg-blue-200 rounded-md shadow-sm transform rotate-2"><p class="font-medium">결혼이나 안정적인 직장에 대한 생각이 다른 것 같아요.</p></div>
+                        <div class="sticky-note relative p-4 bg-yellow-200 rounded-md shadow-sm transform -rotate-2"><p class="font-medium">대화할 때 스마트폰만 보는 모습이..^^</p></div>
+                    </div>
+                    <form id="sticky-note-form" class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="sticky-note-input" placeholder="여기에 경험을 입력하세요..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14B8A6] focus:outline-none">
+                        <button type="submit" id="sticky-note-submit-btn" class="bg-[#14B8A6] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#0F766E] transition-colors disabled:bg-gray-400">공감의 벽에 추가</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">활동 2. 영상 속 가족 갈등 분석하기</h4>
+                    <p class="text-lg mb-6 text-gray-700">드라마 속 갈등 장면을 보고, 각 인물의 입장을 헤아려 봅시다.</p>
+                    <div class="aspect-video bg-gray-800 rounded-lg flex items-center justify-center text-white mb-6"><iframe class="w-full h-full" src="https://www.youtube.com/embed/dTofGTe1cns?si=KuCtqcvOdayFDLYF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div><h5 class="font-bold text-xl mb-2">함께 생각해 볼 질문 1</h5><p class="text-gray-700">영상 속 어머니의 행동이 **‘부모로서’** 어떤 마음에서 비롯되었을까요?</p></div>
+                        <div><h5 class="font-bold text-xl mb-2">함께 생각해 볼 질문 2</h5><p class="text-gray-700">딸의 입장에서 **가장 서운했을 지점**은 무엇이었을까요?</p></div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">활동 3. 나라면 어떻게? 해결책 찾기</h4>
+                    <p class="text-lg text-gray-700 mb-6">"만약 선생님께서 영상 속 가족의 상담사라면, 어머니와 딸에게 각각 어떤 조언을 해주고 싶으십니까?"</p>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h5 class="text-xl font-bold mb-4">우리 그룹의 조언 공유하기</h5>
+                        <form id="advice-form" class="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-6">
+                            <select id="advice-group" class="col-span-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14B8A6] focus:outline-none">
+                                <option value="" disabled selected>조 선택</option>
+                                <option value="1">1조</option>
+                                <option value="2">2조</option>
+                                <option value="3">3조</option>
+                                <option value="4">4조</option>
+                                <option value="5">5조</option>
+                                <option value="6">6조</option>
+                            </select>
+                            <input type="text" id="advice-input" placeholder="그룹의 핵심 조언을 입력하세요..." class="sm:col-span-2 col-span-1 flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14B8A6] focus:outline-none">
+                            <button type="submit" id="advice-submit-btn" class="sm:col-span-1 col-span-1 bg-[#14B8A6] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#0F766E] transition-colors disabled:bg-gray-400">조언 제출</button>
+                        </form>
+                        <div id="advice-whiteboard" class="p-4 bg-white rounded-lg shadow-inner min-h-[250px] space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part2" class="mb-24 fade-in">
+            <h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Part 2. 이론으로 깊이 더하기</h3>
+            <p class="text-center text-gray-600 mb-12">우리가 나눈 경험들이 왜 중요한 인구교육 주제인지 객관적인 자료로 살펴봅니다.</p>
+            <div class="space-y-12">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">첫 번째 꼭지: 세대 갈등의 현주소와 원인</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gray-50 p-4 rounded-lg border">
+        <img src="https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%EA%B0%88%EB%93%B11.png" alt="대화가 안 통해, 세대 갈등 기사 이미지" class="rounded-md mb-3 object-cover h-40 w-full">
+        <h5 class="font-bold text-lg mb-2">“대화가 안 통해”...세대 갈등, 정치 넘어 일상으로</h5>
+        <p class="text-sm text-gray-600">최근 여론조사에 따르면 국민 10명 중 8명은 우리 사회의 세대 갈등이 심각하다고 느끼는 것으로 나타났다. 이러한 갈등은 정치적 견해 차이를 넘어 직장 문화, 가치관 등 일상 전반으로 확산되고 있다. 전문가들은 급격한 사회 변화 속에서 세대 간 경험의 격차가 커진 것을 주요 원인으로 꼽았다. (A일보, 2025)</p>
+    </div>
+    <div class="bg-gray-50 p-4 rounded-lg border">
+        <img src="https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%EA%B0%88%EB%93%B12.png" alt="MZ세대의 조용한 사직 기사 이미지" class="rounded-md mb-3 object-cover h-40 w-full">
+        <h5 class="font-bold text-lg mb-2">MZ세대의 ‘조용한 사직’, 기성세대는 ‘나약함’으로 본다</h5>
+        <p class="text-sm text-gray-600">‘주어진 일만 하겠다’는 MZ세대의 ‘조용한 사직’ 열풍에 대해 기성세대는 조직에 대한 책임감 부족이라 비판한다. 반면 젊은 세대는 일과 삶의 균형을 중시하는 합리적인 태도라고 반박한다. 동일한 현상을 두고 세대별로 전혀 다른 해석을 내놓으며 갈등의 골이 깊어지고 있다. (B경제, 2025)</p>
+    </div>
+    <div class="bg-gray-50 p-4 rounded-lg border">
+        <img src="https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%EA%B0%88%EB%93%B13.png" alt="가족 내 대화 단절 기사 이미지" class="rounded-md mb-3 object-cover h-40 w-full">
+        <h5 class="font-bold text-lg mb-2">가족 내 대화 단절, ‘세대 갈등’의 시작점</h5>
+        <p class="text-sm text-gray-600">사회적 갈등의 축소판은 바로 가정이다. 부모와 자녀 간 소통 부재가 각 세대에 대한 부정적 고정관념을 강화하고 있다는 지적이 나온다. “자녀는 자기 생각만 한다”는 부모와 “부모는 꼰대”라는 자녀의 인식 차이는 결국 서로에 대한 이해를 포기하게 만드는 악순환으로 이어진다. (C뉴스, 2025)</p>
+    </div>
+</div>
+
+                    <p class="text-gray-700 leading-relaxed mb-6">최근 조사에 따르면, 우리 사회의 세대 갈등이 앞으로 더 심각해질 것이라는 비관적 전망이 증가하고 있습니다. 특히 젊은 세대일수록 미래를 더 어둡게 예측하는 경향을 보였습니다. 다른 세대와의 대화나 협업이 어렵다고 느끼는 비율도 상당하여, 이는 단순한 인식의 차이를 넘어 사회적 소통의 단절로 이어질 수 있음을 시사합니다.</p>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%EC%84%B8%EB%8C%80%EA%B0%88%EB%93%B1%20%EC%A0%84%EB%A7%9D%20%ED%86%B5%EA%B3%84.png" alt="세대갈등 전망 통계" class="rounded-lg shadow-md w-full">
+                        <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%EC%84%B8%EB%8C%80%20%EA%B0%84%20%EC%96%B4%EB%A0%A4%EC%9B%80%20%ED%86%B5%EA%B3%84.png" alt="세대 간 대화 어려움 통계" class="rounded-lg shadow-md w-full">
+                    </div>
+                    <p class="citation">출처: 한국리서치, 2025년 세대인식조사</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">두 번째 꼭지: 가족 구조의 변화와 갈등 양상</h4>
+                    <p class="text-gray-700 mb-6 leading-relaxed">급격한 산업화와 도시화는 가족의 형태를 크게 바꾸었습니다. 1960년대 피라미드형이었던 인구구조는 2020년 항아리형을 거쳐, 2067년에는 노년층이 훨씬 두터운 역피라미드형으로 변화할 것으로 예측됩니다. 이러한 변화는 노부모 부양 부담 증가, 전통적 성 역할의 혼재, 세대 간 소통 단절 등 새로운 가족 갈등을 야기합니다. 특히 가족 내 갈등은 부모-자녀 간 갈등이 가장 높은 비율을 차지하며, 이는 가족 기능 약화와 해체로 이어질 수 있는 심각한 문제입니다.</p>
+                    <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%EC%9D%B8%EA%B5%AC%EC%97%B0%EB%A0%B9%EA%B5%AC%EC%A1%B0%EC%9D%98%20%EB%B3%80%ED%99%94%20%EC%B6%94%EC%9D%B4.png" alt="인구연령구조의 변화 추이" class="rounded-lg shadow-md w-full mb-6">
+                    
+                    <div class="mt-8 border-t pt-8">
+                        <h5 class="text-xl font-bold mb-4">인구 구조 유형별 특징 알아보기</h5>
+                        <div id="pyramid-buttons" class="flex flex-wrap gap-3 mb-4">
+                            </div>
+                        <div id="pyramid-content" class="p-6 bg-gray-50 rounded-lg min-h-[200px] flex items-center gap-6">
+                            </div>
+                    </div>
+
+                    <p class="citation">김유경. (2015). 가족변화에 따른 가족갈등양상과 정책과제. 보건복지포럼, 228, 49-65.</p>
+                    <p class="citation">통계청. (2019). 장래인구특별추계: 2017-2067.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">세 번째 꼭지: 세대 통합을 위한 과제</h4>
+                    
+                    <div class="space-y-8">
+                        <div>
+                            <h5 class="text-xl font-bold text-teal-800 mb-3">(1) 부모와 자녀 사이에서 발생할 수 있는 갈등의 원인과 구조</h5>
+                            <p class="text-gray-700 leading-relaxed">청소년기 자녀와 부모 간의 갈등은 자연스러운 발달 과정의 일부이다. 청소년은 자율성에 대한 욕구가 급증하며 부모의 통제로부터 벗어나려 하고, 부모는 자녀를 보호하고 사회적 규범을 가르치려는 역할 사이에서 갈등을 겪는다. 특히, 부모가 자녀의 사생활이나 이성 교제, 학업 문제에 대해 과도하게 개입할 때 갈등이 심화되는 경향이 있다. 이는 각자의 역할과 기대가 충돌하며 발생하는 구조적 문제로 이해해야 한다.</p>
+                            <p class="citation">이정연, & 이은희. (2018). 청소년기 자녀와 부모 간의 갈등과 해결전략에 관한 연구. 청소년학연구, 25(5), 1-25.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-xl font-bold text-teal-800 mb-3">(2) 세대 간 소통 방법 탐색</h5>
+                            <p class="text-gray-700 leading-relaxed">효과적인 세대 간 소통은 ‘적극적 경청’에서 시작된다. 적극적 경청이란 상대방의 말을 단순히 듣는 것을 넘어, 그 안에 담긴 감정과 의도를 파악하려는 노력을 포함한다. 자녀의 말을 비판 없이 수용하고, ‘나-전달법(I-message)’을 사용하여 자신의 생각과 감정을 솔직하게 표현하는 것이 중요하다. 예를 들어, “너는 왜 맨날 방을 안 치우니?”(너-전달법)라고 비난하기보다, “네 방이 어지러우니(상황), 엄마는 답답한 마음이 들어(감정). 함께 정리해주면 좋겠어(부탁).”(나-전달법)와 같이 표현하는 방식이다.</p>
+                            <p class="citation">Gordon, T. (2000). Parent Effectiveness Training. Three Rivers Press.</p>
+                            <p class="citation">교육부. (2015). 2015 개정 교육과정 중학교 기술·가정 교과서.</p>
+                        </div>
+                        <div>
+                            <h5 class="text-xl font-bold text-teal-800 mb-3">(3) 건강한 가족 의사소통 태도</h5>
+                            <p class="text-gray-700 leading-relaxed">건강한 가족 관계는 개방적이고 긍정적인 의사소통 환경에서 형성된다. 가족 구성원의 의견을 존중하고, 갈등이 발생했을 때 회피하거나 비난하기보다 문제 해결을 위해 협력하는 태도가 필요하다. 모든 가족 구성원이 동등한 발언권을 가지며, 서로의 감정을 자유롭게 표현할 수 있는 분위기를 조성하는 것이 중요하다. 이러한 긍정적 상호작용은 가족의 유대감을 강화하고, 청소년 자녀의 사회성 발달에도 긍정적인 영향을 미친다.</p>
+                            <p class="citation">Satir, V. (1988). The new peoplemaking. Science and Behavior Books.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part3" class="mb-24 fade-in">
+            <h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Part 3. 표준 지도안 톺아보기</h3>
+            <p class="text-center text-gray-600 mb-12">오늘 우리가 체험하고 학습한 내용이 담긴 표준 지도안을 시각적으로 확인해봅니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="lesson-plan-gallery">
+                    <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%ED%91%9C%EC%A4%80%EA%B5%90%EC%95%88_1.jpg" alt="표준교안 1페이지: 도입 및 활동 안내" class="w-full h-full object-contain rounded-lg border">
+                    <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%ED%91%9C%EC%A4%80%EA%B5%90%EC%95%88_2.jpg" alt="표준교안 2페이지: 활동1, 2, 3 상세 내용" class="w-full h-full object-contain rounded-lg border">
+                    <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%ED%91%9C%EC%A4%80%EA%B5%90%EC%95%88_3.jpg" alt="표준교안 3페이지: 이론 학습 및 개념 정리" class="w-full h-full object-contain rounded-lg border">
+                    <img src="https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%ED%91%9C%EC%A4%80%EA%B5%90%EC%95%88_4.jpg" alt="표준교안 4페이지: 적용 및 마무리 활동" class="w-full h-full object-contain rounded-lg border">
+                </div>
+                 <div class="mt-12 border-t pt-8">
+                    <h4 class="text-2xl font-bold mb-4 text-[#0F766E]">세종 이야기: 뒤웅박고을</h4>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <p class="text-gray-700 mb-6 leading-relaxed">지도안의 도입 자료로 활용된 '뒤웅박고을'은 세종시 전동면에 위치한 전통 장류 테마 마을입니다. 수많은 장독대가 늘어선 풍경은 정성과 기다림이라는 전통적 가치를 상징합니다. 최근 드라마 '엄마친구아들'의 촬영지로 알려지며 더욱 주목받고 있습니다. 이 공간은 학생들에게 가족 관계 역시 장(醬)처럼 시간과 노력을 통해 깊어진다는 점을 시각적으로 전달하는 좋은 교육 자료가 될 수 있습니다.</p>
+                             <ul class="space-y-4">
+                                <li><span class="font-bold text-teal-700">질문 1:</span> 교육적 관점에서 ‘뒤웅박고을’은 학생들에게 어떤 의미를 줄 수 있는 공간일까요?</li>
+                                <li><span class="font-bold text-teal-700">질문 2:</span> 이곳을 활용하여 학생들과 ‘전통’과 ‘가족’에 대한 이야기를 어떻게 시작하시겠습니까?</li>
+                             </ul>
+                        </div>
+                        <div class="h-64 bg-gray-200 rounded-lg bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/syj9671-cell/0825_-/main/%EB%92%A4%EC%9B%85%EB%B0%95%EA%B3%A0%EC%9D%84.jpg')"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="part4" class="fade-in">
+            <h3 class="text-3xl font-bold text-center mb-2 text-gray-800">Part 4. 실전 대비: 나만의 교수법 설계하기</h3>
+            <p class="text-center text-gray-600 mb-12">실제 교실에서 마주할 수 있는 돌발 상황에 대처하고, 자신만의 수업 전략을 설계합니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-lg space-y-12">
+                <div>
+                    <h4 class="text-2xl font-bold mb-6 text-[#0F766E]">활동 1. 워크숍: 교실 돌발 상황 시뮬레이션</h4>
+                    <div id="scenario-container" class="space-y-8">
+                        <div>
+                            <p class="text-lg font-medium mb-4">아래 5가지 교실 돌발 상황 중 하나를 선택하여 해결 방안을 모색하고, 나만의 수업 전략을 지도안에 설계해 보세요.</p>
+                            <div id="scenario-buttons" class="flex flex-wrap gap-3"></div>
+                        </div>
+                        <div id="scenario-content" class="p-6 bg-gray-50 rounded-lg min-h-[200px] hidden">
+                            <h5 id="scenario-title" class="text-xl font-bold mb-3"></h5>
+                            <p id="scenario-description" class="text-gray-700 mb-6"></p>
+                            <div>
+                                <h6 class="font-bold text-lg mb-2">나만의 수업 재구성 전략</h6>
+                                <textarea id="strategy-input" class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-[#14B8A6] focus:outline-none" placeholder="이 상황을 예방하거나 해결하기 위한 나만의 지도 전략을 여기에 작성해보세요..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t pt-12">
+                     <h4 class="text-2xl font-bold mb-6 text-[#0F766E]">활동 2. [지도상 유의점] 적용 및 개인화</h4>
+                     <p class="text-lg text-gray-700 mb-6">성공적인 수업을 위해서는 미리 예상되는 어려움을 점검하고 대비하는 것이 중요합니다. 아래 표준 유의점을 바탕으로, 인쇄된 지도안에 **자신만의 경험을 더한 유의점**을 '빨간 펜'으로 직접 추가해봅시다.</p>
+                     <div class="space-y-4 p-6 border-2 border-red-300 rounded-xl bg-red-50/50 mb-6">
+                         <div class="flex items-start"><span class="text-red-500 font-bold mr-3">§</span><div><h5 class="font-bold text-red-800">정서적 민감성 고려</h5><p class="text-gray-600">가족 갈등 주제이므로 사적 경험 발표를 강요하지 않고, 익명 작성·패들렛 활용을 권장합니다.</p></div></div>
+                         <div class="flex items-start"><span class="text-red-500 font-bold mr-3">§</span><div><h5 class="font-bold text-red-800">역할극 활동 관리</h5><p class="text-gray-600">친구를 희화화하거나 과도하게 감정 표현하지 않도록 사전 안내하고, 발표 시간을 30초~1분으로 제한하여 분위기를 유지합니다.</p></div></div>
+                         <div class="flex items-start"><span class="text-red-500 font-bold mr-3">§</span><div><h5 class="font-bold text-red-800">디지털 도구 활용 안내</h5><p class="text-gray-600">패들렛 작성 시 실명 대신 닉네임 사용이 가능함을 알리고, 발표 전 교사가 민감한 표현을 필터링합니다.</p></div></div>
+                          <div class="flex items-start"><span class="text-red-500 font-bold mr-3">§</span><div><h5 class="font-bold text-red-800">시간 관리 주의</h5><p class="text-gray-600">드라마 영상, 모둠 활동, 역할극 등 시간이 길어질 수 있는 활동은 명확한 시간 안내가 필수입니다.</p></div></div>
+                         <div class="flex items-start"><span class="text-red-500 font-bold mr-3">§</span><div><h5 class="font-bold text-red-800">인구교육 연계 강조</h5><p class="text-gray-600">갈등 해결을 가족 구조 변화, 정서적 건강과 연결하여 단순 심리 수업이 아닌 인구교육의 의미를 명확히 전달합니다.</p></div></div>
+                     </div>
+                     <div>
+                         <h5 class="font-bold text-lg mb-2 text-gray-800">내가 생각한 유의점 추가하기</h5>
+                         <textarea id="my-notes-input" class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-[#14B8A6] focus:outline-none" placeholder="예: 남학생들의 참여를 독려하기 위해, 역할극 대신 스포츠팀의 갈등 상황으로 비유하여 설명하는 시간을 갖는다..."></textarea>
+                     </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-24">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>세종시 인구교육 강사 양성 과정</p>
+            <p class="text-sm text-gray-400 mt-2">&copy; 2025. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 🚨 이 URL을 자신의 Apps Script 웹 앱 URL로 반드시 교체하세요.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4vTu9lAhLh_D0MEvS1fS4nfRg7TWj5gRVPtr15j_BM2Pd9z9X6OFqe4G5L6xIJ63z/exec";
+
+    const stickyNoteWall = document.getElementById('sticky-note-wall');
+    const adviceWhiteboard = document.getElementById('advice-whiteboard');
+    const colors = ['bg-yellow-200', 'bg-pink-200', 'bg-blue-200', 'bg-green-200', 'bg-purple-200'];
+
+    function createStickyNote(text) {
+        const note = document.createElement('div');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const rotation = Math.random() * 4 - 2;
+        note.className = `sticky-note relative p-4 ${color} rounded-md shadow-sm`;
+        note.style.transform = `rotate(${rotation}deg)`;
+        const p = document.createElement('p');
+        p.className = 'font-medium';
+        p.textContent = text;
+        note.appendChild(p);
+        stickyNoteWall.appendChild(note);
+    }
+
+    function createWhiteboardEntry(group, text) {
+        const entry = document.createElement('div');
+        entry.className = 'p-3 bg-gray-100 border-l-4 border-teal-500 rounded-r-lg flex items-center gap-4';
+        const groupTag = document.createElement('span');
+        groupTag.className = 'flex-shrink-0 font-bold bg-teal-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg';
+        groupTag.textContent = `${group}조`;
+        const p = document.createElement('p');
+        p.textContent = text;
+        entry.appendChild(groupTag);
+        entry.appendChild(p);
+        adviceWhiteboard.prepend(entry);
+    }
+    
+    function loadInitialData() {
+        fetch(SCRIPT_URL)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    stickyNoteWall.innerHTML = '';
+                    adviceWhiteboard.innerHTML = '';
+                    data.forEach(item => {
+                        if (item.type === 'sticky-note') {
+                            createStickyNote(item.content);
+                        } else if (item.type === 'advice' && item.group) {
+                            createWhiteboardEntry(item.group, item.content);
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error loading initial data:', error));
+    }
+    
+    // [수정] UX 향상을 위해 버튼 상태 변경 로직 추가
+    function sendData(type, content, group = '', buttonElement) {
+        const originalButtonText = buttonElement.textContent;
+        buttonElement.disabled = true;
+        buttonElement.textContent = '전송 중...';
+
+        const formData = new FormData();
+        formData.append('type', type);
+        formData.append('content', content);
+        formData.append('group', group);
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+        })
+        .catch(error => console.error('Fetch Error:', error))
+        .finally(() => {
+            buttonElement.disabled = false;
+            buttonElement.textContent = originalButtonText;
+        });
+    }
+    
+    const stickyNoteForm = document.getElementById('sticky-note-form');
+    const stickyNoteInput = document.getElementById('sticky-note-input');
+    const stickyNoteSubmitBtn = document.getElementById('sticky-note-submit-btn');
+    stickyNoteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = stickyNoteInput.value.trim();
+        if (text) {
+            createStickyNote(text);
+            sendData('sticky-note', text, '', stickyNoteSubmitBtn);
+            stickyNoteInput.value = '';
+        }
+    });
+
+    const adviceForm = document.getElementById('advice-form');
+    const adviceInput = document.getElementById('advice-input');
+    const adviceGroupSelect = document.getElementById('advice-group');
+    const adviceSubmitBtn = document.getElementById('advice-submit-btn');
+    adviceForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = adviceInput.value.trim();
+        const group = adviceGroupSelect.value;
+        if (text && group) {
+            createWhiteboardEntry(group, text);
+            sendData('advice', text, group, adviceSubmitBtn);
+            adviceInput.value = '';
+            adviceGroupSelect.value = '';
+        } else if (!group) {
+            alert('조를 선택해주세요.');
+        } else if (!text) {
+            alert('조언을 입력해주세요.');
+        }
+    });
+    
+    loadInitialData();
+    setInterval(loadInitialData, 10000);
+
+    // --- [추가] 키워드 선택 및 차트 스크립트 ---
+    const keywordContainer = document.getElementById('keyword-container');
+    const keywordTags = Array.from(keywordContainer.getElementsByClassName('keyword-tag'));
+    let keywordChart = null;
+
+    function updateKeywordChart() {
+        const selectedKeywords = keywordTags
+            .filter(tag => tag.classList.contains('selected'))
+            .map(tag => tag.textContent);
+        
+        // 이 부분은 실제로는 서버에서 집계된 데이터를 받아와야 합니다.
+        // 여기서는 데모를 위해 각 선택된 키워드에 임의의 투표 수를 할당합니다.
+        const keywordData = keywordTags.map(tag => {
+            const isSelected = selectedKeywords.includes(tag.textContent);
+            return {
+                label: tag.textContent,
+                count: isSelected ? Math.floor(Math.random() * 5) + 1 : 0
+            };
+        });
+        
+        const labels = keywordData.map(d => d.label);
+        const data = keywordData.map(d => d.count);
+
+        if (keywordChart) {
+            keywordChart.data.labels = labels;
+            keywordChart.data.datasets[0].data = data;
+            keywordChart.update();
+        } else {
+            const ctx = document.getElementById('keywordChart').getContext('2d');
+            keywordChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '선택 수',
+                        data: data,
+                        backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                        borderColor: 'rgba(15, 118, 110, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    scales: {
+                        x: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    }
+
+    keywordContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('keyword-tag')) {
+            const selectedCount = keywordContainer.querySelectorAll('.selected').length;
+            if (e.target.classList.contains('selected')) {
+                e.target.classList.remove('selected');
+            } else if (selectedCount < 3) {
+                e.target.classList.add('selected');
+            }
+            updateKeywordChart();
+        }
+    });
+
+   // --- 인구 구조 유형 상호작용 스크립트 ---
+const pyramidData = [
+    { 
+        id: 'pyramid', 
+        title: '피라미드형 (인구 증가형)', 
+        description: '<strong>구조:</strong> 0-14세 유소년 인구 비율이 높아 피라미드처럼 아래가 넓고, 65세 이상 노년 인구로 갈수록 급격히 좁아지는 모양입니다.<br><br><strong>특징:</strong> 높은 출생률과 높은 사망률을 보이는 ‘다산다사(多産多死)’ 사회의 전형적인 모습입니다. 유소년 인구는 많지만 평균 수명이 짧아 노년 인구는 적습니다.<br><br><strong>사회경제적 의미:</strong> 풍부한 젊은 노동력을 바탕으로 경제 성장의 잠재력이 크지만, 동시에 교육, 보건, 주택 등 유소년층을 위한 사회적 비용 부담이 큰 시기입니다. 주로 아프리카와 동남아시아의 개발도상국에서 이 유형을 찾아볼 수 있습니다.<br><br><strong>분석:</strong> 대한민국은 1960년대까지 전형적인 피라미드형 인구 구조를 가지고 있었습니다. 이는 한국전쟁 이후 베이비붐과 맞물려 폭발적인 인구 증가를 이끌었으며, 이후 ‘한강의 기적’이라 불리는 고도 경제 성장의 밑거름이 되었습니다 (통계청, 2021).', 
+        image: 'https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%ED%94%BC%EB%9D%BC%EB%AF%B8%EB%93%9C%ED%98%95.png' 
+    },
+    { 
+        id: 'bell', 
+        title: '종형 (인구 정지형)', 
+        description: '<strong>구조:</strong> 유소년 인구와 생산연령인구(15-64세)의 비율이 비슷하고 노년 인구가 적어 전체적으로 안정적인 종 모양을 띱니다.<br><br><strong>특징:</strong> 낮은 출생률과 낮은 사망률을 보이는 ‘소산소사(少産少死)’ 사회로, 인구 증감이 거의 없는 정체 상태를 보입니다.<br><br><strong>사회경제적 의미:</strong> 안정적인 인구 구조 덕분에 사회 시스템이 성숙기에 접어든 선진국 형태입니다. 그러나 출생률이 더 이상 증가하지 않으면 곧바로 인구 감소 단계로 넘어갈 수 있는 전환점에 해당합니다. 스웨덴, 프랑스 등 복지 제도가 안정된 북유럽 및 서유럽 국가들이 대표적입니다.<br><br><strong>분석:</strong> 대한민국은 1990년대에 이르러 종형에 가까운 구조로 변화했습니다. 산업화와 도시화가 안정되고 가족계획 사업의 영향으로 출산율이 크게 감소했기 때문입니다. 이 시기는 경제적으로 안정되었으나, 저출산 현상이 사회적 문제로 대두되기 시작한 때이기도 합니다 (현대경제연구원, 2022).', 
+        image: 'https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%EC%A2%85%ED%98%95.png' 
+    },
+    { 
+        id: 'coffin', 
+        title: '항아리형 (인구 감소형)', 
+        description: '<strong>구조:</strong> 출생률이 사망률보다 낮아져 유소년 인구는 줄어들고, 과거 베이비붐 세대가 중장년층이 되면서 생산연령인구의 비중이 가장 두드러지는 항아리 모양입니다.<br><br><strong>특징:</strong> 저출산 현상이 장기화되고 평균 수명 연장으로 고령화가 급속도로 진행되는 사회입니다. 전체 인구가 감소하기 시작하는 단계로 진입했음을 의미합니다.<br><br><strong>사회경제적 의미:</strong> 생산가능인구가 감소하면서 노동력 부족과 잠재성장률 저하 문제가 발생합니다. 동시에 노년 인구의 급증으로 연금, 의료 등 복지 비용 부담이 급격히 커져 미래 세대의 부담이 가중됩니다.<br><br><strong>분석:</strong> 현재 대한민국은 전형적인 항아리형 인구 구조에 해당하며, 세계에서 가장 빠른 속도로 고령화가 진행되고 있습니다. 통계청의 장래인구추계에 따르면, 생산연령인구 100명이 부양해야 할 유소년 및 노년 인구를 뜻하는 ‘총부양비’가 2020년 38.7명에서 2070년 116.8명으로 급증할 것으로 예측됩니다. 이는 미래 세대가 짊어져야 할 사회적 부담이 극심해짐을 의미하며, 세대 갈등의 핵심적인 경제적 원인으로 작용하고 있습니다 (통계청, 2021, 장래인구추계).', 
+        image: 'https://raw.githubusercontent.com/syj9671-cell/0825/147f266ce71b8ae42e011cde95f91cf3ceb966a8/%ED%95%AD%EC%95%84%EB%A6%AC%ED%98%95.png' 
+    }
+];
+    const pyramidButtonsContainer = document.getElementById('pyramid-buttons');
+    const pyramidContentContainer = document.getElementById('pyramid-content');
+
+    pyramidData.forEach((item, index) => {
+        const button = document.createElement('button');
+        button.textContent = item.title;
+        button.dataset.pyramidId = item.id;
+        button.className = 'pyramid-btn bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-teal-50 hover:border-teal-400 transition-colors';
+        if (index === 0) button.classList.add('active');
+        pyramidButtonsContainer.appendChild(button);
+    });
+
+    function updatePyramidContent(id) {
+        const selectedData = pyramidData.find(item => item.id === id);
+        pyramidContentContainer.innerHTML = `
+            <img src="${selectedData.image}" alt="${selectedData.title}" class="w-1/3 h-auto rounded-lg">
+            <div class="w-2/3">
+                <h6 class="font-bold text-lg mb-2">${selectedData.title}</h6>
+                <p class="text-sm text-gray-700">${selectedData.description}</p>
+            </div>
+        `;
+    }
+
+    pyramidButtonsContainer.addEventListener('click', e => {
+        if (e.target.classList.contains('pyramid-btn')) {
+            const pyramidId = e.target.dataset.pyramidId;
+            document.querySelectorAll('.pyramid-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            updatePyramidContent(pyramidId);
+        }
+    });
+    
+    // --- 시나리오 상호작용 스크립트 ---
+    const scenarios = [
+        { id: 'cynical', title: '냉소형', description: '역할극 중 한 학생이 “우리 부모님은 제 말을 절대 안 들어요. 이런 거 다 소용없어요.”라며 냉소적인 태도를 보입니다.' },
+        { id: 'overexposed', title: '과다노출형', description: '갈등 경험 발표 중 한 학생이 지나치게 사적이고 자극적인 가족사를 공개하여 다른 학생들이 당황합니다.' },
+        { id: 'rebellious', title: '반발형', description: '한 학생이 “왜 어른들만 존중받아야 하죠? 어른들도 우리를 존중하지 않잖아요.”라며 토론의 본질을 벗어나는 반발을 합니다.' },
+        { id: 'silent', title: '침묵형', description: '대부분의 학생들이 활동에 흥미를 보이지 않고 침묵으로 일관합니다.' },
+        { id: 'playful', title: '장난형', description: '역할극 활동을 시작하자, 몇몇 학생들이 상황을 희화화하며 장난스러운 말투와 과장된 행동으로 수업의 진지한 분위기를 흐립니다.' }
+    ];
+    const scenarioButtonsContainer = document.getElementById('scenario-buttons');
+    const scenarioContent = document.getElementById('scenario-content');
+    const scenarioTitle = document.getElementById('scenario-title');
+    const scenarioDescription = document.getElementById('scenario-description');
+
+    if(scenarioButtonsContainer) {
+        scenarios.forEach(scenario => {
+            const button = document.createElement('button');
+            button.textContent = scenario.title;
+            button.dataset.scenarioId = scenario.id;
+            button.className = 'scenario-btn bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-teal-50 hover:border-teal-400 transition-colors';
+            scenarioButtonsContainer.appendChild(button);
+        });
+
+        scenarioButtonsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('scenario-btn')) {
+                const scenarioId = e.target.dataset.scenarioId;
+                const selectedScenario = scenarios.find(s => s.id === scenarioId);
+                
+                document.querySelectorAll('.scenario-btn').forEach(btn => {
+                    btn.classList.remove('bg-teal-500', 'text-white', 'border-teal-500');
+                    btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                });
+                e.target.classList.add('bg-teal-500', 'text-white', 'border-teal-500');
+
+                scenarioTitle.textContent = selectedScenario.title;
+                scenarioDescription.textContent = selectedScenario.description;
+                scenarioContent.classList.remove('hidden');
+            }
+        });
+    }
+    
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (window.pageYOffset >= sectionTop - 100) { current = section.getAttribute('id'); }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) { link.classList.add('active'); }
+        });
+    });
+    
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // 초기 상태 설정
+    updatePyramidContent('pyramid');
+    updateKeywordChart();
+});
+</script>
+
+</body>
+</html>
